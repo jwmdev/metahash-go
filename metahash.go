@@ -1,5 +1,7 @@
 package metahash
 
+import "time"
+
 type BalanceArgs struct {
 	Address string `json:"address"`
 }
@@ -306,4 +308,65 @@ type Status struct {
 	Result  string `json:"result"`
 	Version string `json:"version"`
 	GitHash string `json:"git_hash"`
+}
+
+//Node structs
+
+//Node data struct
+type Node struct {
+	Address  string `json:"address"`
+	Name     string `json:"name"`
+	NodeType string `json:"node_type"`
+
+	IP           string  `json:"ip"`
+	Latitude     float64 `json:"latitude"`
+	Longitude    float64 `json:"longitude"`
+	CountryShort string  `json:"country_short" `
+	CountryLong  string  `json:"country_long"`
+	Region       string  `json:"region"`
+	City         string  `json:"city"`
+
+	Geo    string `json:"geo"`
+	Status bool   `json:"status"`
+	ROI    string `json:"roi" `
+	QPS    string `json:"qps" `
+	RPS    string `json:"rps"`
+	Trust  string `json:"trust"`
+
+	IsOnline bool `json:"is_online" `
+
+	LastUpdated time.Time `json:"last_updated" `
+	LastChecked time.Time `json:"last_checked" `
+}
+
+//NodeList gives the list of all nodes obtained from the network
+type NodeList struct {
+	Data []NodeData
+}
+type NodeData struct {
+	Address             string   `json:"address"`
+	Host                string   `json:"host"`
+	Name                string   `json:"name"`
+	Type                []string `json:"type"`
+	Bench               string   `json:"bench"`
+	BenchCnt            string   `json:"bench_cnt"`
+	Trust               string   `json:"trust"`
+	OnlineStat          string   `json:"online_stat"`
+	Balance             string   `json:"balance"`
+	Status              string   `json:"status"`
+	StatusParams        string   `json:"status_params"`
+	Version             string   `json:"version"`
+	Rate                string   `json:"rate"`
+	LastRewardAmount    string   `json:"last_reward_amount"`
+	LastDelegatedAmount string   `json:"last_delegated_amount"`
+	Roi                 string   `json:"roi"`
+	Sort                string   `json:"sort"`
+	Ts                  int      `json:"ts"`
+	MaxBenchCnt         string   `json:"max_bench_cnt"`
+	Fake                bool     `json:"fake"`
+	Online              int      `json:"online"`
+	LastTestTs          int64    `json:"last_test_ts"`
+	BenchSuccess        float32  `json:"bench_success"`
+	AvgRps              int64    `json:"avgRps"`
+	IsInternal          bool     `json:"is_internal"`
 }

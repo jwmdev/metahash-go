@@ -1,6 +1,7 @@
 # MetaHash API GO library
 
 An unofficial Golang library for [#MetaHash](https://metahash.org ) blockchain.
+This repository was folked  from the reposity created by [xboston](https://github.com/xboston/metahash-go) and I contributed to the original repository. However, due to major changes I made, I decided to create a new repository to avoid introducing breaking changes to the original repository and affect systems that are already depending on the original repository.
 
 
 ![metahash-go](https://raw.githubusercontent.com/xboston/metahash-go/master/media/metahash-go.png)
@@ -12,13 +13,13 @@ An unofficial Golang library for [#MetaHash](https://metahash.org ) blockchain.
 ### Installation
 
 ```bash
-go get -u github.com/xboston/metahash-go
+go get -u github.com/jwmdev/metahash-go
 ```
 
 ### Information
 
 - [Missing #MetaHash API documentation](https://github.com/xboston/metahash-api)
-- [Original source](https://github.com/metahashorg/crypt_example_php)
+- [Original repository](https://github.com/xboston/metahash-go)
 - [Knowledge base](https://developers.metahash.org)
 - [Testpage portal](http://testpage.metahash.org/)
 
