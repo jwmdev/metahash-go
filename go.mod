@@ -1,4 +1,4 @@
-module github.com/xboston/metahash-go
+module github.com/jwmdev/metahash-go
 
 go 1.12
 

@@ -1,8 +1,8 @@
 package main
 
 import (
+	"github.com/jwmdev/metahash-go"
 	"github.com/k0kubun/pp"
-	"github.com/xboston/metahash-go"
 )
 
 //sample address
