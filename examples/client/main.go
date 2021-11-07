@@ -46,6 +46,18 @@ func main() {
 		pp.Println("error fetching history")
 	}*/
 
+	//fetch history filter
+	filter := &metahash.HistoryFilter{
+		IsDelegate: true,
+	}
+	countTx := 100
+	history, err := metahash.FetchHistoryFilter(address, int64(countTx), filter)
+	if err == nil {
+		pp.Println("fetch-history", history[0]) //TODO: check ifthe history is not nil
+	} else {
+		pp.Println("error fetching history")
+	}
+
 	//get transaction
 	/*transactionDetails, err := metahash.GetTransaction(trx)
 	if err == nil {

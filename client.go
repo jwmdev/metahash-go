@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+
+	"github.com/k0kubun/pp"
 )
 
 const torUrl = "http://tor.net-main.metahashnetwork.com:5795"
@@ -60,7 +62,7 @@ func FetchHistory(address string) ([]*TransactionInfo, error) {
 }
 
 //FetchHistoryRange returns list of transaction history from a given index
-func FetchHistoryFiter(address string, startIndex, numTrx int64) ([]*TransactionInfo, error) {
+func FetchHistoryRange(address string, startIndex, numTrx int64) ([]*TransactionInfo, error) {
 	responseHistory, err := metahashClient.Call("fetch-history", &HistoryArgs{Address: address, BeginTx: startIndex, CountTxs: numTrx})
 	if err == nil {
 		var resultHistory []*TransactionInfo
@@ -73,11 +75,10 @@ func FetchHistoryFiter(address string, startIndex, numTrx int64) ([]*Transaction
 	return nil, err
 }
 
-/*
 //This function is not working because of the metahash api error
 //FetchHistoryFilter returns list of transaction history based on the provide filter
-func FetchHistoryFilter(address string, filter *HistoryFilter) ([]*TransactionInfo, error) {
-	responseHistory, err := metahashClient.Call("fetch-history-filter", &HistoryArgs{Address: address, Filters: *filter})
+func FetchHistoryFilter(address string, countTx int64, filter *HistoryFilter) ([]*TransactionInfo, error) {
+	responseHistory, err := metahashClient.Call("fetch-history-filter", &HistoryArgs{Address: address, CountTxs: countTx, Filters: *filter})
 	if err == nil {
 		pp.Println("response", responseHistory) //TODO: check ifthe history is not nil
 
@@ -89,7 +90,7 @@ func FetchHistoryFilter(address string, filter *HistoryFilter) ([]*TransactionIn
 		return nil, err
 	}
 	return nil, err
-}*/
+}
 
 // GetTransaction  returns the transaction details given the transaction hash
 func GetTransaction(txHash string) (*Transaction, error) {
