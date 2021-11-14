@@ -29,6 +29,63 @@ type Balance struct {
 	Forged            int64  `json:"forged"`
 }
 
+func (b *Balance) CurrentBalance() int64 {
+	if b.Received == 0 && b.Spent == 0 {
+		return 0
+	}
+	return b.Received - b.Spent
+}
+
+func (b *Balance) FullBalance() int64 {
+	return b.CurrentBalance() + b.DelegatedFunds()
+}
+
+/*
+func (b *Balance) TransactionsCount() int64 {
+	return b.CountTxs
+}*/
+
+func (b *Balance) DelegatedAmount() int64 {
+	if b.Delegated == 0 {
+		return 0
+	}
+	return b.Delegated - b.Undelegated
+}
+
+/*
+func (b *Balance) ToHardCap() int64 {
+
+	if b.Delegated == 0 {
+		return 0
+	}
+
+	if b._ToHardCap != 0 {
+		return b._ToHardCap
+	}
+
+	// 10000000000000 - сумма для хардкапа
+	b._ToHardCap = 10000000000000 - b.DelegatedAmount()
+	return b._ToHardCap
+}*/
+
+// Funded function determines how much is the address delegated
+func (b *Balance) Funded() int64 {
+	return b.Delegated - b.Undelegated
+}
+
+// DelegatedFunds function determs how much is delegated to the address
+func (b *Balance) DelegatedFunds() int64 {
+	return b.Delegate - b.Undelegate
+}
+
+func (b *Balance) SeedCapital() int64 {
+	return b.DelegatedFunds()
+}
+
+func (b *Balance) IsNode() bool {
+	return b.Delegated > 0
+}
+
 type TransactionArgs struct {
 	Hash string `json:"hash"`
 }
