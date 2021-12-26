@@ -9,7 +9,7 @@ import (
 	"strings"
 )
 
-const proxUrl = "http://net-main.MetaKey.com:9999"
+const proxUrl = "http://proxy.net-main.metahashnetwork.com:9999"
 
 type MetaTx struct {
 	To    string `json:"to"`

@@ -8,9 +8,11 @@ import (
 	"crypto/x509"
 	"encoding/asn1"
 	"encoding/hex"
+	"errors"
 	"fmt"
 	"math/big"
 	"reflect"
+	"strings"
 )
 
 //Address data type
@@ -75,20 +77,34 @@ func newKey() (Key, error) {
 }
 
 func createKey(private PrivateKey) (Key, error) {
-	decoded, err := hex.DecodeString(string(private))
-	if err != nil {
-		return nil, err
-	}
-	priv, err := x509.ParseECPrivateKey(decoded)
-	if err != nil {
-		return nil, err
+
+	if private == "" {
+		return nil, errors.New("private key cannot be empty")
 	}
 
-	return &key{
-		priv: priv,
-		pub:  &priv.PublicKey,
-		//address: currentAddress, //TODO:generate this address from the public key
-	}, nil
+	// r1 key type has prefix 3077
+	if strings.HasPrefix(string(private), "3077") {
+		decoded, err := hex.DecodeString(string(private))
+		if err != nil {
+			return nil, err
+		}
+		priv, err := x509.ParseECPrivateKey(decoded)
+		if err != nil {
+			return nil, err
+		}
+
+		return &key{
+			priv: priv,
+			pub:  &priv.PublicKey,
+			//address: currentAddress, //TODO:generate this address from the public key
+		}, nil
+	} else if strings.HasPrefix(string(private), "3074") { // k1 key type has prefix 3074
+		// k1 type is not yet implemented
+		return nil, errors.New("secp256k1 key is currently not supported")
+		//return secp256k1.FromHexString(privateKey)
+	} else {
+		return nil, errors.New("unknown private key")
+	}
 }
 
 //Private returns private metahash private key
