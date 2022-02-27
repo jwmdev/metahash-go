@@ -6,8 +6,6 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
-
-	"github.com/k0kubun/pp"
 )
 
 const torUrl = "http://tor.net-main.metahashnetwork.com:5795"
@@ -80,7 +78,7 @@ func FetchHistoryRange(address string, startIndex, numTrx int64) ([]*Transaction
 func FetchHistoryFilter(address string, countTx int64, filter *HistoryFilter) ([]*TransactionInfo, error) {
 	responseHistory, err := metahashClient.Call("fetch-history-filter", &HistoryArgs{Address: address, CountTxs: countTx, Filters: *filter})
 	if err == nil {
-		pp.Println("response", responseHistory) //TODO: check ifthe history is not nil
+		//pp.Println("response", responseHistory) //TODO: check ifthe history is not nil
 
 		var resultHistory []*TransactionInfo
 		err = responseHistory.GetObject(&resultHistory)
@@ -302,12 +300,28 @@ func (nt *NodeTrust) GetTrustData() (*NodeTrustData, error) {
 	var nodeTrustData *NodeTrustData
 
 	str := fmt.Sprint(nt.Data)
-	fmt.Print("node trust data: ", str)
+	//fmt.Print("node trust data: ", str)
 	err := json.Unmarshal([]byte(str), &nodeTrustData)
 	if err == nil {
 		return nodeTrustData, nil
 	}
 	return nil, errors.New("cannot parse node trust data")
+}
+
+//Delegated function returns node delegated to and node delegated from
+func (ntd *NodeTrustData) Delegated() (delegatedTo int64, delegatedFrom int64) {
+	//delegated to
+	//delegatedTo := int64(0)
+	for _, dt := range ntd.DelegateTo {
+		delegatedTo += dt.V
+	}
+
+	//delegated to
+	//delegatedFrom := int64(0)
+	for _, dt := range ntd.DelegatedFrom {
+		delegatedFrom += dt.V
+	}
+	return delegatedTo, delegatedFrom
 }
 
 func GetNodeRaiting(address string, countTests int) (*NodeRaiting, error) {
