@@ -6,9 +6,11 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+
+	"github.com/k0kubun/pp"
 )
 
-const torUrl = "http://tor.net-main.metahashnetwork.com:5795"
+const torUrl = "http://tor.net-main.metahash.org:5795"
 const totalSupplyUrl = "https://app.metahash.io/api/stat/?method=supply"
 
 var metahashClient RPCClient
@@ -20,6 +22,7 @@ func init() {
 // FetchBalance gets the balance information of a given address
 func FetchBalance(address string) (*Balance, error) {
 	responseBalance, err := metahashClient.Call("fetch-balance", &BalanceArgs{Address: address})
+	pp.Print(responseBalance)
 	if err == nil {
 		var resultBalance *Balance
 		err = responseBalance.GetObject(&resultBalance)
@@ -59,7 +62,7 @@ func FetchHistory(address string) ([]*TransactionInfo, error) {
 	return nil, err
 }
 
-//FetchHistoryRange returns list of transaction history from a given index
+// FetchHistoryRange returns list of transaction history from a given index
 func FetchHistoryRange(address string, startIndex, numTrx int64) ([]*TransactionInfo, error) {
 	responseHistory, err := metahashClient.Call("fetch-history", &HistoryArgs{Address: address, BeginTx: startIndex, CountTxs: numTrx})
 	if err == nil {
@@ -73,8 +76,8 @@ func FetchHistoryRange(address string, startIndex, numTrx int64) ([]*Transaction
 	return nil, err
 }
 
-//This function is not working because of the metahash api error
-//FetchHistoryFilter returns list of transaction history based on the provide filter
+// This function is not working because of the metahash api error
+// FetchHistoryFilter returns list of transaction history based on the provide filter
 func FetchHistoryFilter(address string, countTx int64, filter *HistoryFilter) ([]*TransactionInfo, error) {
 	responseHistory, err := metahashClient.Call("fetch-history-filter", &HistoryArgs{Address: address, CountTxs: countTx, Filters: *filter})
 	if err == nil {
@@ -308,7 +311,7 @@ func (nt *NodeTrust) GetTrustData() (*NodeTrustData, error) {
 	return nil, errors.New("cannot parse node trust data")
 }
 
-//Delegated function returns node delegated to and node delegated from
+// Delegated function returns node delegated to and node delegated from
 func (ntd *NodeTrustData) Delegated() (delegatedTo int64, delegatedFrom int64) {
 	//delegated to
 	//delegatedTo := int64(0)
@@ -361,11 +364,11 @@ func GetAddressDelegations(address string, startTx, countTx int64) (*AddressDele
 }
 
 // GetForgingSumAll returns sum all types of forging
-//100; // forging transaction
-//101; // wallet reward forging transaction
-//102; // node reward forging transaction
-//103; // coin reward forging transaction
-//104; // random reward forging transaction
+// 100; // forging transaction
+// 101; // wallet reward forging transaction
+// 102; // node reward forging transaction
+// 103; // coin reward forging transaction
+// 104; // random reward forging transaction
 func GetForgingSumAll() (*ForgingSum, error) {
 	responseLastTxs, err := metahashClient.Call("get-forging-sum-all", nil)
 	if err == nil {

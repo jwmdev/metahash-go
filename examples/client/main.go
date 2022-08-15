@@ -2,10 +2,10 @@ package main
 
 import (
 	"github.com/jwmdev/metahash-go"
-	"github.com/k0kubun/pp"
+	"github.com/yudai/pp"
 )
 
-//sample address
+// sample address
 const address = "0x0062b734726a66f54e9ac72f63af9fd18bd5ca5583061e2c37"         //serengeti node
 const address2 = "0x005b891007c2000fee08e085beb91494f1d3753eb8eee354f0"        //serengeti node
 const trx = "361d5e113648366aa46010fa02ff1f66dcf8045abe4e30547ffaba0506edbdb2" //sample transaction
@@ -15,12 +15,12 @@ func main() {
 
 	//to test the api function, you can uncoment each function
 	//fetch balance
-	/*balance, err := metahash.FetchBalance(address)
+	balance, err := metahash.FetchBalance(address)
 	if err == nil {
 		pp.Println("fetch-balance", balance)
 	} else {
 		pp.Println("error fetching balance")
-	}*/
+	}
 
 	//fetch balances
 	/*balances, err := metahash.FetchBalances(address, address2)
@@ -81,12 +81,12 @@ func main() {
 		pp.Println("error getting blocks")
 	}*/
 
-	block, err := metahash.GetBlockByNumber(500, 2)
+	/*block, err := metahash.GetBlockByNumber(500, 2)
 	if err == nil {
 		pp.Println("block-number", block)
 	} else {
 		pp.Println("error getting block by number transactions")
-	}
+	}*/
 
 	/*numBlocks, err := metahash.GetTotalBlocks()
 	if err == nil {
