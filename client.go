@@ -1,28 +1,41 @@
 package metahash
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"io/ioutil"
 	"net/http"
 
-	"github.com/k0kubun/pp"
+	"github.com/ybbus/jsonrpc/v3"
+	"github.com/yudai/pp"
 )
 
 const torUrl = "http://tor.net-main.metahash.org:5795"
 const totalSupplyUrl = "https://app.metahash.io/api/stat/?method=supply"
 
-var metahashClient RPCClient
+var metahashClient jsonrpc.RPCClient
 
 func init() {
-	metahashClient = NewClient(torUrl)
+	metahashClient = jsonrpc.NewClient(torUrl)
+}
+
+type BlockType int
+
+const (
+	NameOnly BlockType = iota
+	HashesOnly
+	FullDump
+)
+
+func NewClient(baseUrl string) jsonrpc.RPCClient {
+	return jsonrpc.NewClient(baseUrl)
 }
 
 // FetchBalance gets the balance information of a given address
 func FetchBalance(address string) (*Balance, error) {
-	responseBalance, err := metahashClient.Call("fetch-balance", &BalanceArgs{Address: address})
-	pp.Print(responseBalance)
+	responseBalance, err := metahashClient.Call(context.Background(), "fetch-balance", &BalanceArgs{Address: address})
 	if err == nil {
 		var resultBalance *Balance
 		err = responseBalance.GetObject(&resultBalance)
@@ -36,7 +49,7 @@ func FetchBalance(address string) (*Balance, error) {
 
 // FetchBalances gets the balance information of list of addresses
 func FetchBalances(addresses ...string) ([]*Balance, error) {
-	responseBalance, err := metahashClient.Call("fetch-balances", &BalancesArgs{Addresses: addresses})
+	responseBalance, err := metahashClient.Call(context.Background(), "fetch-balances", &BalancesArgs{Addresses: addresses})
 	if err == nil {
 		var resultBalances []*Balance
 		err = responseBalance.GetObject(&resultBalances)
@@ -50,7 +63,7 @@ func FetchBalances(addresses ...string) ([]*Balance, error) {
 
 // FetchHistory returns all transactions history of a given address
 func FetchHistory(address string) ([]*TransactionInfo, error) {
-	responseHistory, err := metahashClient.Call("fetch-history", &HistoryArgs{Address: address})
+	responseHistory, err := metahashClient.Call(context.Background(), "fetch-history", &HistoryArgs{Address: address})
 	if err == nil {
 		var resultHistory []*TransactionInfo
 		err = responseHistory.GetObject(&resultHistory)
@@ -64,7 +77,7 @@ func FetchHistory(address string) ([]*TransactionInfo, error) {
 
 // FetchHistoryRange returns list of transaction history from a given index
 func FetchHistoryRange(address string, startIndex, numTrx int64) ([]*TransactionInfo, error) {
-	responseHistory, err := metahashClient.Call("fetch-history", &HistoryArgs{Address: address, BeginTx: startIndex, CountTxs: numTrx})
+	responseHistory, err := metahashClient.Call(context.Background(), "fetch-history", &HistoryArgs{Address: address, BeginTx: startIndex, CountTxs: numTrx})
 	if err == nil {
 		var resultHistory []*TransactionInfo
 		err = responseHistory.GetObject(&resultHistory)
@@ -79,7 +92,7 @@ func FetchHistoryRange(address string, startIndex, numTrx int64) ([]*Transaction
 // This function is not working because of the metahash api error
 // FetchHistoryFilter returns list of transaction history based on the provide filter
 func FetchHistoryFilter(address string, countTx int64, filter *HistoryFilter) ([]*TransactionInfo, error) {
-	responseHistory, err := metahashClient.Call("fetch-history-filter", &HistoryArgs{Address: address, CountTxs: countTx, Filters: *filter})
+	responseHistory, err := metahashClient.Call(context.Background(), "fetch-history-filter", &HistoryArgs{Address: address, CountTxs: countTx, Filters: *filter})
 	if err == nil {
 		//pp.Println("response", responseHistory) //TODO: check ifthe history is not nil
 
@@ -95,7 +108,7 @@ func FetchHistoryFilter(address string, countTx int64, filter *HistoryFilter) ([
 
 // GetTransaction  returns the transaction details given the transaction hash
 func GetTransaction(txHash string) (*Transaction, error) {
-	responseTransaction, err := metahashClient.Call("get-tx", &TransactionArgs{Hash: txHash})
+	responseTransaction, err := metahashClient.Call(context.Background(), "get-tx", &TransactionArgs{Hash: txHash})
 	if err == nil {
 		var resultTransaction *Transaction
 		err = responseTransaction.GetObject(&resultTransaction)
@@ -109,7 +122,7 @@ func GetTransaction(txHash string) (*Transaction, error) {
 
 // GetLastTransactions returns the list of last transactions made
 func GetLastTransactions() ([]*TransactionInfo, error) {
-	responseLastTxs, err := metahashClient.Call("get-last-txs", &LastTxsArgs{})
+	responseLastTxs, err := metahashClient.Call(context.Background(), "get-last-txs", &LastTxsArgs{})
 	if err == nil {
 		var resultLastTxs []*TransactionInfo
 		err = responseLastTxs.GetObject(&resultLastTxs)
@@ -125,7 +138,7 @@ func GetLastTransactions() ([]*TransactionInfo, error) {
 //GetBlocks
 
 func GetBlocks(startBlock, numBlocks int64) ([]*Block, error) {
-	responseBlocks, err := metahashClient.Call("get-blocks", &BlocksArgs{CountBlocks: numBlocks, BeginBlock: startBlock})
+	responseBlocks, err := metahashClient.Call(context.Background(), "get-blocks", &BlocksArgs{CountBlocks: numBlocks, BeginBlock: startBlock})
 	if err == nil {
 		var resultBlocks []*Block
 		err = responseBlocks.GetObject(&resultBlocks)
@@ -141,14 +154,16 @@ func GetBlocks(startBlock, numBlocks int64) ([]*Block, error) {
 // blockType should between 0 and 2: 0 = 0 or there isn’t - only block name, 1 = only hashes, 2 = full block dump,
 //issue: block type 1 is not working at the moment
 
-func GetBlockByNumber(blockNumber, blockType int64) (*Block, error) {
+func GetBlockByNumber(blockNumber int64, blockType BlockType) (*Block, error) {
 
-	if blockType > 2 || blockType == 1 { //skip block type 1 as it not working properly
+	if blockType < 0 || blockType > 2 || blockType == HashesOnly { //skip block type 1 as it not working properly
 		blockType = 0
 	}
 
 	blkArg := &BlockByNumberArgs{Number: blockNumber, Type: int8(blockType)}
-	responseBlockByNumber, err := metahashClient.Call("get-block-by-number", blkArg)
+	responseBlockByNumber, err := metahashClient.Call(context.Background(), "get-block-by-number", blkArg)
+
+	pp.Println(responseBlockByNumber)
 	if err == nil {
 		var resultBlockByNumber *Block
 		err = responseBlockByNumber.GetObject(&resultBlockByNumber)
@@ -160,14 +175,14 @@ func GetBlockByNumber(blockNumber, blockType int64) (*Block, error) {
 	return nil, err
 }
 
-func GetBlockByNumberFilter(blockNumber, startTx, numTx, blockType int64) (*Block, error) {
+func GetBlockByNumberFilter(blockNumber, startTx, numTx int64, blockType BlockType) (*Block, error) {
 
-	if blockType > 2 || blockType == 1 { //skip block type 1 as it not working properly
+	if blockType < 0 || blockType > 2 || blockType == HashesOnly { //skip block type 1 as it not working properly
 		blockType = 0
 	}
 
 	blkArg := &BlockByNumberArgs{Number: blockNumber, BeginTx: startTx, CountTxs: numTx, Type: int8(blockType)}
-	responseBlockByNumber, err := metahashClient.Call("get-block-by-number", blkArg)
+	responseBlockByNumber, err := metahashClient.Call(context.Background(), "get-block-by-number", blkArg)
 	if err == nil {
 		var resultBlockByNumber *Block
 		err = responseBlockByNumber.GetObject(&resultBlockByNumber)
@@ -180,7 +195,7 @@ func GetBlockByNumberFilter(blockNumber, startTx, numTx, blockType int64) (*Bloc
 }
 
 func GetTotalBlocks() (int64, error) {
-	responseCountBlocks, err := metahashClient.Call("get-count-blocks", &CountBlocksArgs{})
+	responseCountBlocks, err := metahashClient.Call(context.Background(), "get-count-blocks", &CountBlocksArgs{})
 	if err == nil {
 		var resultCountBlocks *CountBlocks
 		err = responseCountBlocks.GetObject(&resultCountBlocks)
@@ -201,7 +216,7 @@ func GetBlockByHash(blockHash string, startIndex, numTx, blockType int) (*Block,
 		blockType = 0
 	}
 	blkArg := &BlockByHashArgs{Hash: blockHash, BeginTx: int64(startIndex), CountTxs: int64(numTx), Type: int8(blockType)}
-	responseBlockByNumber, err := metahashClient.Call("get-block-by-hash", blkArg)
+	responseBlockByNumber, err := metahashClient.Call(context.Background(), "get-block-by-hash", blkArg)
 	if err == nil {
 		var resultBlockByNumber *Block
 		err = responseBlockByNumber.GetObject(&resultBlockByNumber)
@@ -214,7 +229,7 @@ func GetBlockByHash(blockHash string, startIndex, numTx, blockType int) (*Block,
 }
 func GetDumpBlockByHash(blockHash string, isHex bool) (*DumpBlock, error) {
 	arg := &DumpBlockByHashArgs{Hash: blockHash, IsHex: isHex}
-	responseDumpBlockByHash, err := metahashClient.Call("get-dump-block-by-hash", arg)
+	responseDumpBlockByHash, err := metahashClient.Call(context.Background(), "get-dump-block-by-hash", arg)
 	if err == nil {
 		var dumpBlock *DumpBlock
 		err = responseDumpBlockByHash.GetObject(&dumpBlock)
@@ -228,7 +243,7 @@ func GetDumpBlockByHash(blockHash string, isHex bool) (*DumpBlock, error) {
 
 func GetDumpBlockByNumber(blockNumber int64, isHex bool) (*DumpBlock, error) {
 	blockArg := &DumpBlockByNumberArgs{Number: blockNumber, IsHex: isHex}
-	responseDumpBlockByNumber, err := metahashClient.Call("get-dump-block-by-number", blockArg)
+	responseDumpBlockByNumber, err := metahashClient.Call(context.Background(), "get-dump-block-by-number", blockArg)
 	if err == nil {
 		var dumbBlock *DumpBlock
 		err = responseDumpBlockByNumber.GetObject(&dumbBlock)
@@ -244,7 +259,7 @@ func GetNodeStats(address string) (*NodeStats, error) {
 	args := &NodeArgs{
 		Address: address,
 	}
-	responsNodeStats, err := metahashClient.Call("get-last-node-stat-result", args)
+	responsNodeStats, err := metahashClient.Call(context.Background(), "get-last-node-stat-result", args)
 	if err == nil {
 		var nodeStats *NodeStats
 		err = responsNodeStats.GetObject(&nodeStats)
@@ -272,7 +287,7 @@ func GetLastNodeStatTrust(address string) (*NodeTrust, error) {
 		Address: address,
 	}
 
-	nodeTrustResp, err := metahashClient.Call("get-last-node-stat-trust", args)
+	nodeTrustResp, err := metahashClient.Call(context.Background(), "get-last-node-stat-trust", args)
 	if err == nil {
 		var nodeTrust *NodeTrust
 		err = nodeTrustResp.GetObject(&nodeTrust)
@@ -286,7 +301,7 @@ func GetLastNodeStatTrust(address string) (*NodeTrust, error) {
 func GetLastNodeCount(counts int) (*LastNodeCount, error) {
 	arg := NodeArgs{CountTests: counts}
 
-	nodeLastNodeCountResp, err := metahashClient.Call("get-all-last-nodes-count", arg)
+	nodeLastNodeCountResp, err := metahashClient.Call(context.Background(), "get-all-last-nodes-count", arg)
 	if err == nil {
 		var nodeNodeCount *LastNodeCount
 		err = nodeLastNodeCountResp.GetObject(&nodeNodeCount)
@@ -327,13 +342,13 @@ func (ntd *NodeTrustData) Delegated() (delegatedTo int64, delegatedFrom int64) {
 	return delegatedTo, delegatedFrom
 }
 
-func GetNodeRaiting(address string, countTests int) (*NodeRaiting, error) {
+/*func GetNodeRaiting(address string, countTests int) (*NodeRaiting, error) {
 	args := &NodeArgs{
 		Address:    address,
 		CountTests: countTests,
 	}
 
-	nodeRaitingResp, err := metahashClient.Call("get-nodes-raiting", args)
+	nodeRaitingResp, err := metahashClient.Call(context.Background(), "get-nodes-raiting", args)
 	if err == nil {
 		var nodeRaiting *NodeRaiting
 		err = nodeRaitingResp.GetObject(&nodeRaiting)
@@ -343,7 +358,7 @@ func GetNodeRaiting(address string, countTests int) (*NodeRaiting, error) {
 		return nil, err
 	}
 	return nil, err
-}
+}*/
 
 func GetAddressDelegations(address string, startTx, countTx int64) (*AddressDelegations, error) {
 	args := &NodeArgs{
@@ -351,7 +366,7 @@ func GetAddressDelegations(address string, startTx, countTx int64) (*AddressDele
 		BeginTx:  startTx,
 		CountTxs: countTx,
 	}
-	responsNodeStats, err := metahashClient.Call("get-address-delegations", args)
+	responsNodeStats, err := metahashClient.Call(context.Background(), "get-address-delegations", args)
 	if err == nil {
 		var nodeStats *AddressDelegations
 		err = responsNodeStats.GetObject(&nodeStats)
@@ -370,7 +385,7 @@ func GetAddressDelegations(address string, startTx, countTx int64) (*AddressDele
 // 103; // coin reward forging transaction
 // 104; // random reward forging transaction
 func GetForgingSumAll() (*ForgingSum, error) {
-	responseLastTxs, err := metahashClient.Call("get-forging-sum-all", nil)
+	responseLastTxs, err := metahashClient.Call(context.Background(), "get-forging-sum-all", nil)
 	if err == nil {
 		var forgingSum *ForgingSum
 		err = responseLastTxs.GetObject(&forgingSum)
@@ -385,7 +400,7 @@ func GetForgingSumAll() (*ForgingSum, error) {
 
 func GetForgingSum(blockIndent int) (*ForgingSum, error) {
 	arg := &ForginSumArgs{BlockIndent: blockIndent}
-	responseLastTxs, err := metahashClient.Call("get-forging-sum", arg)
+	responseLastTxs, err := metahashClient.Call(context.Background(), "get-forging-sum", arg)
 	if err == nil {
 		var forgingSum *ForgingSum
 		err = responseLastTxs.GetObject(&forgingSum)
@@ -398,7 +413,7 @@ func GetForgingSum(blockIndent int) (*ForgingSum, error) {
 }
 
 func GetCommonBalance() (int64, error) {
-	balanceRes, err := metahashClient.Call("get-common-balance", nil)
+	balanceRes, err := metahashClient.Call(context.Background(), "get-common-balance", nil)
 
 	if err == nil {
 		var balance *CommonBalance

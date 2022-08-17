@@ -166,6 +166,37 @@ type Block struct {
 	Txs []*TransactionInfo `json:"txs"`
 }
 
+type BlockType1 struct {
+	Type       string `json:"type,omitempty"`
+	Hash       string `json:"hash,omitempty"`
+	PrevHash   string `json:"prev_hash,omitempty"`
+	TxHash     string `json:"tx_hash,omitempty"`
+	Number     int    `json:"number,omitempty"`
+	Timestamp  int    `json:"timestamp,omitempty"`
+	CountTxs   int    `json:"count_txs,omitempty"`
+	Sign       string `json:"sign,omitempty"`
+	Size       int    `json:"size,omitempty"`
+	FileName   string `json:"fileName,omitempty"`
+	Signatures []struct {
+		From        string `json:"from,omitempty"`
+		To          string `json:"to,omitempty"`
+		Value       int    `json:"value,omitempty"`
+		Transaction string `json:"transaction,omitempty"`
+		Data        string `json:"data,omitempty"`
+		Timestamp   int    `json:"timestamp,omitempty"`
+		Type        string `json:"type,omitempty"`
+		BlockNumber int    `json:"blockNumber,omitempty"`
+		Signature   string `json:"signature,omitempty"`
+		Publickey   string `json:"publickey,omitempty"`
+		Fee         int    `json:"fee,omitempty"`
+		RealFee     int    `json:"realFee,omitempty"`
+		Nonce       int    `json:"nonce,omitempty"`
+		IntStatus   int    `json:"intStatus,omitempty"`
+		Status      string `json:"status,omitempty"`
+	} `json:"signatures,omitempty"`
+	Txs []string `json:"txs,omitempty"`
+}
+
 type LastTxsArgs struct {
 }
 
@@ -174,11 +205,11 @@ type TransactionInfo struct {
 	To           string `json:"to" db:"toA"`
 	Value        int64  `json:"value"`
 	Transaction  string `json:"transaction"`
-	Data         string `json:"data"`
+	Data         string `json:"data,omitempty"`
 	TimeStamp    int64  `json:"timestamp" db:"timestamp,int64"`
 	Type         string `json:"type" db:"typeTx"`
 	BlockNumber  int64  `json:"blockNumber" db:"blockNumber"`
-	Signature    string `json:"signature"`
+	Signature    string `json:"signature,omitempty"`
 	PublicKey    string `json:"publickey"`
 	Fee          int64  `json:"fee"`
 	RealFee      int64  `json:"realFee" db:"realFee"`
@@ -369,7 +400,7 @@ type Status struct {
 
 //Node structs
 
-//Node data struct
+// Node data struct
 type Node struct {
 	Address  string `json:"address"`
 	Name     string `json:"name"`
@@ -396,7 +427,7 @@ type Node struct {
 	LastChecked time.Time `json:"last_checked" `
 }
 
-//NodeList gives the list of all nodes obtained from the network
+// NodeList gives the list of all nodes obtained from the network
 type NodeList struct {
 	Data []NodeData
 }

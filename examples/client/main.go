@@ -15,12 +15,12 @@ func main() {
 
 	//to test the api function, you can uncoment each function
 	//fetch balance
-	balance, err := metahash.FetchBalance(address)
+	/*balance, err := metahash.FetchBalance(address)
 	if err == nil {
 		pp.Println("fetch-balance", balance)
 	} else {
 		pp.Println("error fetching balance")
-	}
+	}*/
 
 	//fetch balances
 	/*balances, err := metahash.FetchBalances(address, address2)
@@ -38,7 +38,7 @@ func main() {
 		pp.Println("error fetching history")
 	}*/
 
-	//fetch history
+	//fetch range history
 	/*historyRange, err := metahash.FetchHistoryRange(address, 1, 2)
 	if err == nil {
 		pp.Println("fetch-history", historyRange)
@@ -47,6 +47,7 @@ func main() {
 	}*/
 
 	//fetch history filter
+	//not working due to data type issues
 	/*filter := &metahash.HistoryFilter{
 		IsDelegate: true,
 	}
@@ -55,7 +56,7 @@ func main() {
 	if err == nil {
 		pp.Println("fetch-history", history[0]) //TODO: check ifthe history is not nil
 	} else {
-		pp.Println("error fetching history")
+		pp.Printf("error fetching history: %v\n", err)
 	}*/
 
 	//get transaction
@@ -104,14 +105,13 @@ func main() {
 			pp.Println("error getting block by hash")
 		}*/
 
-	/*
-		// dumpblock by hash
-		block, err := metahash.GetDumpBlockByHash(blockHash, true)
-		if err == nil {
-			pp.Println("dump blokc by hash", block)
-		} else {
-			pp.Println("error getting dump block by hash")
-		}*/
+	// dumpblock by hash
+	/*block, err := metahash.GetDumpBlockByHash(blockHash, true)
+	if err == nil {
+		pp.Println("dump blokc by hash", block)
+	} else {
+		pp.Println("error getting dump block by hash")
+	}*/
 
 	/*block, err := metahash.GetDumpBlockByNumber(500, true)
 	if err == nil {
@@ -155,12 +155,14 @@ func main() {
 		pp.Printf("error getting last node count: %v\n", err)
 	}*/
 
-	/*raiting, err := metahash.GetNodeRaiting(address, 100)
-	if err == nil {
-		pp.Println("raiting", raiting)
-	} else {
-		pp.Printf("error getting raiting: %v\n", err)
-	}*/
+	/*
+		//this api is not existing
+		raiting, err := metahash.GetNodeRaiting(address, 100)
+		if err == nil {
+			pp.Println("raiting", raiting)
+		} else {
+			pp.Printf("error getting raiting: %v\n", err)
+		}*/
 
 	/*addDelegations, err := metahash.GetAddressDelegations(address, 0, 10)
 	if err == nil {
@@ -168,19 +170,23 @@ func main() {
 	} else {
 		pp.Printf("error getting address delegations: %v\n", err)
 	}*/
-	/*forgingSum, err := metahash.GetForgingSumAll()
-	if err == nil {
-		pp.Println("forging sum", forgingSum)
-	} else {
-		pp.Printf("error getting forging sum: %v\n", err)
-	}*/
+	/*
+		//not working
+		forgingSum, err := metahash.GetForgingSumAll()
+		if err == nil {
+			pp.Println("forging sum", forgingSum)
+		} else {
+			pp.Printf("error getting forging sum: %v\n", err)
+		}*/
 
-	/*forgingSum, err := metahash.GetForgingSum(3)
-	if err == nil {
-		pp.Println("forging sum", forgingSum)
-	} else {
-		pp.Printf("error getting forging sum: %v\n", err)
-	}*/
+	/*
+		//not working
+		forgingSum, err := metahash.GetForgingSum(3)
+		if err == nil {
+			pp.Println("forging sum", forgingSum)
+		} else {
+			pp.Printf("error getting forging sum: %v\n", err)
+		}*/
 
 	/*balance, err := metahash.GetCommonBalance()
 	if err == nil {
@@ -189,10 +195,10 @@ func main() {
 		pp.Printf("error getting balance: %v\n", err)
 	}*/
 
-	/*supply, err := metahash.MetahashSupply()
+	supply, err := metahash.MetahashSupply()
 	if err == nil {
 		pp.Println("metahash supply", supply)
 	} else {
 		pp.Printf("error getting supply: %v\n", err)
-	}*/
+	}
 }

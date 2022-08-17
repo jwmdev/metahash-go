@@ -1,12 +1,15 @@
 package metahash
 
 import (
+	"context"
 	"encoding/hex"
 	"errors"
 	"log"
 	"math/big"
 	"strconv"
 	"strings"
+
+	"github.com/ybbus/jsonrpc/v3"
 )
 
 const proxUrl = "http://proxy.net-main.metahashnetwork.com:9999"
@@ -19,7 +22,7 @@ type MetaTx struct {
 	Nonce int64  `json:"nonce"`
 }
 
-//TransactionArgs argument
+// TransactionArgs argument
 type MetaTxArg struct {
 	To     string `json:"to"`
 	Value  string `json:"value"`
@@ -30,7 +33,7 @@ type MetaTxArg struct {
 	Sign   string `json:"sign"`
 }
 
-//TransactionResponse response
+// TransactionResponse response
 type MetaTxResp struct {
 	Result string
 	Params string
@@ -41,7 +44,7 @@ type MetaKey struct {
 	Key Key //private key in ex format
 }
 
-//Iniate a new wallet by supplying the wallet address and private key
+// Iniate a new wallet by supplying the wallet address and private key
 func InitWallet(walletAddress, privateKey string) (*MetaKey, error) {
 	key, err := createKey(PrivateKey(privateKey))
 	if err != nil {
@@ -105,9 +108,9 @@ func (mk *MetaKey) sendTransaction(tr *MetaTx) (string, error) {
 		Sign:   sign,
 	}
 
-	sendClient := NewClient(proxUrl)
+	sendClient := jsonrpc.NewClient(proxUrl)
 
-	resp, err := sendClient.Call("mhc_send", arg)
+	resp, err := sendClient.Call(context.Background(), "mhc_send", arg)
 
 	var txHash string
 	if err == nil {
@@ -121,7 +124,7 @@ func (mk *MetaKey) sendTransaction(tr *MetaTx) (string, error) {
 	return txHash, nil
 }
 
-//SignTransaction generates signature
+// SignTransaction generates signature
 func (mk *MetaKey) SignTransaction(data []byte) (string, error) {
 
 	sign, err := mk.Key.Sign(data)

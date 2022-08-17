@@ -1,6 +1,8 @@
 package main
 
 import (
+	"context"
+
 	"github.com/jwmdev/metahash-go"
 	"github.com/k0kubun/pp"
 )
@@ -13,7 +15,7 @@ var blockHash = "0b3dafdd27595922daa304ebaf5f0a3b190a62a0af47de83ed359a303c1d476
 func main() {
 	metahashClient := metahash.NewClient(addr)
 
-	responseBalance, err := metahashClient.Call("fetch-balance", &metahash.BalanceArgs{Address: wall})
+	responseBalance, err := metahashClient.Call(context.Background(), "fetch-balance", &metahash.BalanceArgs{Address: wall})
 	if err == nil {
 		var resultBalance *metahash.Balance
 		err = responseBalance.GetObject(&resultBalance)
@@ -22,7 +24,7 @@ func main() {
 		}
 	}
 
-	responseHistory, err := metahashClient.Call("fetch-history", &metahash.HistoryArgs{Address: wall})
+	responseHistory, err := metahashClient.Call(context.Background(), "fetch-history", &metahash.HistoryArgs{Address: wall})
 	if err == nil {
 		var resultHistory []*metahash.TransactionInfo
 		err = responseHistory.GetObject(&resultHistory)
@@ -33,7 +35,7 @@ func main() {
 		pp.Println("err", err.Error())
 	}
 
-	responseTransaction, err := metahashClient.Call("get-tx", &metahash.TransactionArgs{Hash: trxHash})
+	responseTransaction, err := metahashClient.Call(context.Background(), "get-tx", &metahash.TransactionArgs{Hash: trxHash})
 	if err == nil {
 		var resultTransaction *metahash.Transaction
 		err = responseTransaction.GetObject(&resultTransaction)
@@ -44,7 +46,7 @@ func main() {
 		pp.Println("err", err.Error())
 	}
 
-	responseBlockByNumber, err := metahashClient.Call("get-block-by-number", &metahash.BlockByNumberArgs{Number: 1})
+	responseBlockByNumber, err := metahashClient.Call(context.Background(), "get-block-by-number", &metahash.BlockByNumberArgs{Number: 1})
 	if err == nil {
 		var resultBlockByNumber *metahash.Block
 		err = responseBlockByNumber.GetObject(&resultBlockByNumber)
@@ -55,7 +57,7 @@ func main() {
 		pp.Println("err", err.Error())
 	}
 
-	responseBlockByHash, err := metahashClient.Call("get-block-by-hash", &metahash.BlockByHashArgs{Hash: blockHash})
+	responseBlockByHash, err := metahashClient.Call(context.Background(), "get-block-by-hash", &metahash.BlockByHashArgs{Hash: blockHash})
 	if err == nil {
 		var resultBlockByHash *metahash.Block
 		err = responseBlockByHash.GetObject(&resultBlockByHash)
@@ -66,7 +68,7 @@ func main() {
 		pp.Println("err", err.Error())
 	}
 
-	responseLastTxs, err := metahashClient.Call("get-last-txs", &metahash.LastTxsArgs{})
+	responseLastTxs, err := metahashClient.Call(context.Background(), "get-last-txs", &metahash.LastTxsArgs{})
 	if err == nil {
 		var resultLastTxs []*metahash.TransactionInfo
 		err = responseLastTxs.GetObject(&resultLastTxs)
@@ -77,7 +79,7 @@ func main() {
 		pp.Println("err", err.Error())
 	}
 
-	responseBlocks, err := metahashClient.Call("get-blocks", &metahash.BlocksArgs{CountBlocks: 2})
+	responseBlocks, err := metahashClient.Call(context.Background(), "get-blocks", &metahash.BlocksArgs{CountBlocks: 2})
 	if err == nil {
 		var resultBlocks []*metahash.Block
 		err = responseBlocks.GetObject(&resultBlocks)
@@ -88,7 +90,7 @@ func main() {
 		pp.Println("err", err.Error())
 	}
 
-	responseDumpBlockByNumber, err := metahashClient.Call("get-dump-block-by-number", &metahash.DumpBlockByNumberArgs{Number: 1, IsHex: true})
+	responseDumpBlockByNumber, err := metahashClient.Call(context.Background(), "get-dump-block-by-number", &metahash.DumpBlockByNumberArgs{Number: 1, IsHex: true})
 	if err == nil {
 		var resultDumpBlockByNumber *metahash.DumpBlock
 		err = responseDumpBlockByNumber.GetObject(&resultDumpBlockByNumber)
@@ -99,7 +101,7 @@ func main() {
 		pp.Println("err", err.Error())
 	}
 
-	responseDumpBlockByHash, err := metahashClient.Call("get-dump-block-by-hash", &metahash.DumpBlockByHashArgs{Hash: blockHash, IsHex: true})
+	responseDumpBlockByHash, err := metahashClient.Call(context.Background(), "get-dump-block-by-hash", &metahash.DumpBlockByHashArgs{Hash: blockHash, IsHex: true})
 	if err == nil {
 		var resultDumpBlockByHash *metahash.DumpBlock
 		err = responseDumpBlockByHash.GetObject(&resultDumpBlockByHash)
@@ -110,7 +112,7 @@ func main() {
 		pp.Println("err", err.Error())
 	}
 
-	responseCountBlocks, err := metahashClient.Call("get-count-blocks", &metahash.CountBlocksArgs{})
+	responseCountBlocks, err := metahashClient.Call(context.Background(), "get-count-blocks", &metahash.CountBlocksArgs{})
 	if err == nil {
 		var resultCountBlocks *metahash.CountBlocks
 		err = responseCountBlocks.GetObject(&resultCountBlocks)
