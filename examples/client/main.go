@@ -89,12 +89,12 @@ func main() {
 		pp.Println("error getting block by number transactions")
 	}*/
 
-	/*numBlocks, err := metahash.GetTotalBlocks()
+	numBlocks, err := metahash.GetTotalBlocks()
 	if err == nil {
 		pp.Println("total number of blocks", numBlocks)
 	} else {
 		pp.Println("error getting blocks")
-	}*/
+	}
 
 	/*
 		//get block by hash
@@ -148,12 +148,13 @@ func main() {
 		pp.Printf("error getting node trust data: %v\n", err)
 	}*/
 
-	/*lastNodeCount, err := metahash.GetLastNodeCount(20)
+	//not working
+	lastNodeCount, err := metahash.GetLastNodeCount(2)
 	if err == nil {
 		pp.Println("last node count", lastNodeCount)
 	} else {
 		pp.Printf("error getting last node count: %v\n", err)
-	}*/
+	}
 
 	/*
 		//this api is not existing
@@ -188,12 +189,14 @@ func main() {
 			pp.Printf("error getting forging sum: %v\n", err)
 		}*/
 
-	/*balance, err := metahash.GetCommonBalance()
-	if err == nil {
-		pp.Println("balance", balance)
-	} else {
-		pp.Printf("error getting balance: %v\n", err)
-	}*/
+	/*
+		//not working
+		balance, err := metahash.GetCommonBalance()
+		if err == nil {
+			pp.Println("balance", balance)
+		} else {
+			pp.Printf("error getting balance: %v\n", err)
+		}*/
 
 	supply, err := metahash.MetahashSupply()
 	if err == nil {

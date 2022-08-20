@@ -9,7 +9,6 @@ import (
 	"net/http"
 
 	"github.com/ybbus/jsonrpc/v3"
-	"github.com/yudai/pp"
 )
 
 const torUrl = "http://tor.net-main.metahash.org:5795"
@@ -163,7 +162,6 @@ func GetBlockByNumber(blockNumber int64, blockType BlockType) (*Block, error) {
 	blkArg := &BlockByNumberArgs{Number: blockNumber, Type: int8(blockType)}
 	responseBlockByNumber, err := metahashClient.Call(context.Background(), "get-block-by-number", blkArg)
 
-	pp.Println(responseBlockByNumber)
 	if err == nil {
 		var resultBlockByNumber *Block
 		err = responseBlockByNumber.GetObject(&resultBlockByNumber)

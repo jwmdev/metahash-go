@@ -273,18 +273,20 @@ type NodeArgs struct {
 }
 
 type NodeTest struct {
-	TimeStamp int64  `json:"timestamp"`
-	Method    string `json:"method"`
-	Params    struct {
-		Mhaddr   string `json:"mhaddr"`
-		IP       string `json:"ip"`
-		QPS      int64  `json:"qps"`
-		Rps      int64  `json:"rps"`
-		Closed   string `json:"closed"`
-		Timeouts string `json:"timeouts"`
-		Ver      string `json:"ver"`
-		Success  string `json:"success"`
-	} `json:"params"`
+	TimeStamp int64          `json:"timestamp"`
+	Method    string         `json:"method"`
+	Params    *NodeTestParam `json:"params"`
+}
+
+type NodeTestParam struct {
+	Mhaddr   string `json:"mhaddr"`
+	IP       string `json:"ip"`
+	QPS      int64  `json:"qps"`
+	Rps      int64  `json:"rps"`
+	Closed   string `json:"closed"`
+	Timeouts string `json:"timeouts"`
+	Ver      string `json:"ver"`
+	Success  string `json:"success"`
 }
 
 type NodeStats struct {
@@ -301,20 +303,22 @@ type NodeStats struct {
 }
 
 type NodeStatsState struct {
-	ID      string `json:"id"`
-	Jsonrpc string `json:"jsonrpc"`
-	Method  string `json:"method"`
-	Params  struct {
-		Type              string `json:"type"`
-		Ver               string `json:"ver"`
-		Address           string `json:"address"`
-		Host              string `json:"host"`
-		Blockheightcheck  string `json:"blockHeightCheck"`
-		Requestsperminute string `json:"requestsPerMinute"`
-		Latency           string `json:"latency"`
-		Geo               string `json:"geo"`
-		Success           string `json:"success"`
-	} `json:"params"`
+	ID      string      `json:"id"`
+	Jsonrpc string      `json:"jsonrpc"`
+	Method  string      `json:"method"`
+	Params  *NodeParams `json:"params"`
+}
+
+type NodeParams struct {
+	Type              string `json:"type"`
+	Ver               string `json:"ver"`
+	Address           string `json:"address"`
+	Host              string `json:"host"`
+	Blockheightcheck  string `json:"blockHeightCheck"`
+	Requestsperminute string `json:"requestsPerMinute"`
+	Latency           string `json:"latency"`
+	Geo               string `json:"geo"`
+	Success           string `json:"success"`
 }
 
 type NodeTrust struct {
@@ -326,27 +330,27 @@ type NodeTrust struct {
 }
 
 type NodeTrustData struct {
-	State      int `json:"state"`
-	Trust      int `json:"trust"`
-	DelegateTo []struct {
-		A string `json:"a"`
-		V int64  `json:"v"`
-	} `json:"delegate_to"`
-	DelegatedFrom []struct {
-		A string `json:"a"`
-		V int64  `json:"v"`
-	} `json:"delegated_from"`
+	State         int             `json:"state"`
+	Trust         int             `json:"trust"`
+	DelegateTo    []*AddressValue `json:"delegate_to"`
+	DelegatedFrom []*AddressValue `json:"delegated_from"`
 }
 
+type AddressValue struct {
+	A string `json:"a"`
+	V int64  `json:"v"`
+}
 type LastNodeCount struct {
-	Nodes []struct {
-		Node  string `json:"node"`
-		IP    string `json:"ip"`
-		Type  string `json:"type"`
-		Count int    `json:"count"`
-	} `json:"nodes"`
-	Day          int `json:"day"`
-	Lastblockday int `json:"lastBlockDay"`
+	Nodes        []*LastNode `json:"nodes"`
+	Day          int         `json:"day"`
+	Lastblockday int         `json:"lastBlockDay"`
+}
+
+type LastNode struct {
+	Node  string `json:"node"`
+	IP    string `json:"ip"`
+	Type  string `json:"type"`
+	Count int    `json:"count"`
 }
 
 type NodeRaiting struct {
