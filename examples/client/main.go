@@ -39,12 +39,12 @@ func main() {
 	}*/
 
 	//fetch range history
-	/*historyRange, err := metahash.FetchHistoryRange(address, 1, 2)
+	historyRange, err := metahash.FetchHistoryRange(address, 3, 3)
 	if err == nil {
 		pp.Println("fetch-history", historyRange)
 	} else {
 		pp.Println("error fetching history")
-	}*/
+	}
 
 	//fetch history filter
 	//not working due to data type issues
@@ -89,12 +89,12 @@ func main() {
 		pp.Println("error getting block by number transactions")
 	}*/
 
-	numBlocks, err := metahash.GetTotalBlocks()
+	/*numBlocks, err := metahash.GetTotalBlocks()
 	if err == nil {
 		pp.Println("total number of blocks", numBlocks)
 	} else {
 		pp.Println("error getting blocks")
-	}
+	}*/
 
 	/*
 		//get block by hash
@@ -139,9 +139,9 @@ func main() {
 		pp.Println("node trust", trust)
 	} else {
 		pp.Printf("error getting node trust: %v\n", err)
-	}
+	}*/
 
-	trustData, err := trust.GetTrustData()
+	/*trustData, err := trust.GetTrustData()
 	if err == nil {
 		pp.Println("node trust data", trustData)
 	} else {
@@ -149,12 +149,12 @@ func main() {
 	}*/
 
 	//not working
-	lastNodeCount, err := metahash.GetLastNodeCount(2)
+	/*lastNodeCount, err := metahash.GetLastNodeCount(2)
 	if err == nil {
 		pp.Println("last node count", lastNodeCount)
 	} else {
 		pp.Printf("error getting last node count: %v\n", err)
-	}
+	}*/
 
 	/*
 		//this api is not existing
@@ -198,10 +198,10 @@ func main() {
 			pp.Printf("error getting balance: %v\n", err)
 		}*/
 
-	supply, err := metahash.MetahashSupply()
+	/*supply, err := metahash.MetahashSupply()
 	if err == nil {
 		pp.Println("metahash supply", supply)
 	} else {
 		pp.Printf("error getting supply: %v\n", err)
-	}
+	}*/
 }

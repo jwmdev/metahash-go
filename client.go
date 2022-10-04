@@ -11,7 +11,8 @@ import (
 	"github.com/ybbus/jsonrpc/v3"
 )
 
-const torUrl = "http://tor.net-main.metahash.org:5795"
+// const torUrl = "http://tor.net-main.metahash.org:5795"
+const torUrl = "http://tor.net-main.metahashnetwork.com:5795"
 const totalSupplyUrl = "https://app.metahash.io/api/stat/?method=supply"
 
 var metahashClient jsonrpc.RPCClient
